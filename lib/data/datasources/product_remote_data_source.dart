@@ -66,7 +66,7 @@ AppException _mapDioException(DioException error) {
     case DioExceptionType.cancel:
     case DioExceptionType.unknown:
     case DioExceptionType.transformTimeout:
-      return UnknownDioException(error.message ?? 'Unknown Dio error.');
+      return UnknownDioException(_sanitizeMessage(error.message));
   }
 }
 
@@ -88,4 +88,14 @@ AppException _exceptionForStatus(int statusCode) {
     default:
       return UnknownDioException('Unexpected HTTP status: $statusCode');
   }
+}
+
+String _sanitizeMessage(String? message) {
+  if (message == null) return 'An unexpected network error occurred.';
+  final trimmed = message.trim();
+  if (trimmed.isEmpty) return 'An unexpected network error occurred.';
+  // Avoid returning terse or non-descriptive tokens that may come from Dio internals
+  const badTokens = <String>{'response', 'error', 'null'};
+  if (badTokens.contains(trimmed.toLowerCase())) return 'An unexpected network error occurred.';
+  return trimmed;
 }

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:getxwithmvvmdemo/presentation/widgets/loading_widget.dart';
 
 import '../controllers/product_controller.dart';
+import '../widgets/empty_widget.dart';
+import '../widgets/error_widget.dart';
 
 class ProductListPage extends GetView<ProductController> {
   const ProductListPage({super.key});
@@ -34,36 +37,46 @@ class ProductListPage extends GetView<ProductController> {
           Expanded(
             child: Obx(() {
               if (controller.isLoading.value && controller.products.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
+                return const LoadingWidget();
               }
               if (controller.products.isEmpty &&
                   controller.errorMessage.value.isNotEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(controller.errorMessage.value),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: controller.fetchProducts,
-                        child: const Text('Retry'),
-                      ),
-                    ],
-                  ),
-                );
+                return AppErrorWidget(onRetry: controller.fetchProducts);
               }
               if (controller.filterdProduct.isEmpty) {
-                return const Center(child: Text('No products found.'));
+                return const EmptyWidget();
               }
-              return ListView.builder(
-                itemCount: controller.filterdProduct.length,
-                itemBuilder: (BuildContext context, int index) {
-                  final product = controller.filterdProduct[index];
-                  return ListTile(
-                    title: Text(product.title),
-                    subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
-                  );
-                },
+
+              final displayedProducts = controller.filterdProduct;
+              return RefreshIndicator(
+                onRefresh: controller.refreshProducts,
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (notification) {
+                    if (notification.metrics.pixels >=
+                        notification.metrics.maxScrollExtent - 300) {
+                      controller.fetchMoreProducts();
+                    }
+                    return false;
+                  },
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16),
+                    itemCount: displayedProducts.length + (controller.isLoadingMore.value ? 1 : 0),
+                    itemBuilder: (context, int index) {
+                      if (index >= displayedProducts.length) {
+                        return const Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                      final product = controller.filterdProduct[index];
+                      return ListTile(
+                        title: Text(product.title),
+                        subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
+                      );
+                    },
+                  ),
+                ),
               );
             }),
           ),

@@ -37,6 +37,7 @@ final class ProductController extends GetxController {
   void onInit() {
     super.onInit();
     searchController.addListener(listener);
+    fetchProducts();
   }
 
   @override

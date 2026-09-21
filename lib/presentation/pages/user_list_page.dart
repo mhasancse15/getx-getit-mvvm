@@ -37,8 +37,7 @@ class UserListPage extends GetView<UserController> {
                 hintText: 'Search by name, username, or email',
                 prefixIcon: const Icon(Icons.search_rounded),
                 suffixIcon: Obx(
-                      () =>
-                  controller.searchQuery.value.isEmpty
+                      () => controller.searchQuery.value.isEmpty
                       ? const SizedBox.shrink()
                       : IconButton(
                     onPressed: controller.searchController.clear,
