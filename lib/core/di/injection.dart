@@ -11,6 +11,7 @@ import '../../domain/repositories/user_repository.dart';
 import '../../domain/usecases/get_products.dart';
 import '../../domain/usecases/get_users.dart';
 import '../../presentation/controllers/product_controller.dart';
+import '../../presentation/controllers/product_details_controller.dart';
 import '../../presentation/controllers/user_controller.dart';
 import '../network/dio_client.dart';
 import '../network/network_info.dart';
@@ -57,5 +58,12 @@ Future<void> configureDependencies() async {
   );
   getIt.registerFactory<ProductController>(
     () => ProductController(getIt<GetProducts>()),
+  );
+
+  getIt.registerLazySingleton<GetProductById>(
+    () => GetProductById(getIt<ProductRepository>()),
+  );
+  getIt.registerFactory<ProductDetailsController>(
+    () => ProductDetailsController(getIt<GetProductById>()),
   );
 }
