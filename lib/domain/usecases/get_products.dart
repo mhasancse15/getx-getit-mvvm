@@ -15,3 +15,13 @@ final class GetProducts {
     return _productRepository.getProducts(limit: limit, skip: skip);
   }
 }
+
+final class GetProductById {
+  GetProductById(this._repository);
+
+  final ProductRepository _repository;
+
+  Future<Either<Failure,Product>> call(int id) {
+    return _repository.getProductById(id);
+  }
+}
