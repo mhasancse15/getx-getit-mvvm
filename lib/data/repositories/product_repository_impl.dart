@@ -63,4 +63,38 @@ final class ProductRepositoryImpl implements ProductRepository {
       return left(UnexpectedFailure(error.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure,Product>> getProductById(int id) async {
+    try {
+      if (!await _networkInfo.isConnected) {
+        return left(const NoInternetFailure());
+      }
+
+      final response = await _productRemoteDataSource.getProductById(id = id);
+      return right(
+        response.toEntity(),
+      );
+    } on NoInternetException catch (error) {
+      return left(NoInternetFailure(error.message));
+    } on ConnectionTimeoutException catch (error) {
+      return left(TimeoutFailure(error.message));
+    } on ReceiveTimeoutException catch (error) {
+      return left(TimeoutFailure(error.message));
+    } on SendTimeoutException catch (error) {
+      return left(TimeoutFailure(error.message));
+    } on BadRequestException catch (error) {
+      return left(BadRequestFailure(error.message));
+    } on UnauthorizedException catch (error) {
+      return left(UnauthorizedFailure(error.message));
+    } on NotFoundException catch (error) {
+      return left(NotFoundFailure(error.message));
+    } on ServerException catch (error) {
+      return left(ServerFailure(error.message));
+    } on UnknownDioException catch (error) {
+      return left(UnexpectedFailure(error.message));
+    } catch (error) {
+      return left(UnexpectedFailure(error.toString()));
+    }
+  }
 }
