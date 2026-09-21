@@ -63,11 +63,9 @@ class ProductListPage extends GetView<ProductController> {
                   child: ProductGridView(
                     products: displayedProducts,
                     onProductTap: (product) {
-                      Get.snackbar("Alert", "Not Implemented");
-                      /*Get.toNamed(
+                      Get.toNamed(
                         '/products/${product.id}',
-                        arguments: product,
-                      );*/
+                      );
                     },
                   ),
                 ),

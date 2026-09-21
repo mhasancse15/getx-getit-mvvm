@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:getxwithmvvmdemo/domain/entities/product/product.dart';
 import '../../core/error/failures.dart';
+import '../../data/models/product/product_model.dart';
 
 
 abstract interface class ProductRepository {
@@ -8,4 +9,6 @@ abstract interface class ProductRepository {
     required int limit,
     required int skip,
   });
+
+  Future<Either<Failure,Product>> getProductById(int id);
 }
