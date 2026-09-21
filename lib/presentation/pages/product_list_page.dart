@@ -5,6 +5,7 @@ import 'package:getxwithmvvmdemo/presentation/widgets/loading_widget.dart';
 import '../controllers/product_controller.dart';
 import '../widgets/empty_widget.dart';
 import '../widgets/error_widget.dart';
+import '../widgets/product_gridview.dart';
 
 class ProductListPage extends GetView<ProductController> {
   const ProductListPage({super.key});
@@ -56,24 +57,17 @@ class ProductListPage extends GetView<ProductController> {
                         notification.metrics.maxScrollExtent - 300) {
                       controller.fetchMoreProducts();
                     }
+
                     return false;
                   },
-                  child: ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.all(16),
-                    itemCount: displayedProducts.length + (controller.isLoadingMore.value ? 1 : 0),
-                    itemBuilder: (context, int index) {
-                      if (index >= displayedProducts.length) {
-                        return const Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                      }
-                      final product = controller.filterdProduct[index];
-                      return ListTile(
-                        title: Text(product.title),
-                        subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
-                      );
+                  child: ProductGridView(
+                    products: displayedProducts,
+                    onProductTap: (product) {
+                      Get.snackbar("Alert", "Not Implemented");
+                      /*Get.toNamed(
+                        '/products/${product.id}',
+                        arguments: product,
+                      );*/
                     },
                   ),
                 ),
