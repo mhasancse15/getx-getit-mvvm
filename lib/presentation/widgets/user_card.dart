@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../domain/entities/user.dart';
+import '../../domain/entities/user/user.dart';
 
 class UserCard extends StatelessWidget {
   const UserCard({required this.user, required this.onTap, super.key});

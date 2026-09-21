@@ -1,20 +1,24 @@
 import 'package:dartz/dartz.dart';
+import 'package:getxwithmvvmdemo/domain/repositories/product_repository.dart';
 
 import '../../core/error/exceptions.dart';
 import '../../core/error/failures.dart';
 import '../../core/network/network_info.dart';
-import '../../domain/entities/user/user.dart';
-import '../../domain/repositories/user_repository.dart';
-import '../datasources/user_remote_data_source.dart';
+import '../../domain/entities/product/product.dart';
+import '../datasources/product_remote_data_source.dart';
+import '../models/product/product_model.dart';
 
-final class UserRepositoryImpl implements UserRepository {
-  UserRepositoryImpl({required this._remoteDataSource, required this._networkInfo});
+final class ProductRepositoryImpl implements ProductRepository {
+  ProductRepositoryImpl({
+    required this._productRemoteDataSource,
+    required this._networkInfo,
+  });
 
-  final UserRemoteDataSource _remoteDataSource;
+  final ProductRemoteDataSource _productRemoteDataSource;
   final NetworkInfo _networkInfo;
 
   @override
-  Future<Either<Failure, UsersPage>> getUsers({
+  Future<Either<Failure, ProductsPage>> getProducts({
     required int limit,
     required int skip,
   }) async {
@@ -23,13 +27,15 @@ final class UserRepositoryImpl implements UserRepository {
         return left(const NoInternetFailure());
       }
 
-      final response = await _remoteDataSource.getUsers(
+      final response = await _productRemoteDataSource.getProducts(
         limit: limit,
         skip: skip,
       );
       return right(
-        UsersPage(
-          users: response.users.map((model) => model.toEntity()).toList(growable: false),
+        ProductsPage(
+          products: response.products
+              .map((model) => model.toEntity())
+              .toList(growable: false),
           total: response.total,
           skip: response.skip,
           limit: response.limit,

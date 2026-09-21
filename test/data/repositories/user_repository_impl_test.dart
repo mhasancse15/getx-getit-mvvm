@@ -4,8 +4,8 @@ import 'package:getxwithmvvmdemo/core/error/exceptions.dart';
 import 'package:getxwithmvvmdemo/core/error/failures.dart';
 import 'package:getxwithmvvmdemo/core/network/network_info.dart';
 import 'package:getxwithmvvmdemo/data/datasources/user_remote_data_source.dart';
-import 'package:getxwithmvvmdemo/data/models/user_model.dart';
-import 'package:getxwithmvvmdemo/data/models/users_response_model.dart';
+import 'package:getxwithmvvmdemo/data/models/user/user_model.dart';
+import 'package:getxwithmvvmdemo/data/models/user/users_response_model.dart';
 import 'package:getxwithmvvmdemo/data/repositories/user_repository_impl.dart';
 import 'package:mocktail/mocktail.dart';
 

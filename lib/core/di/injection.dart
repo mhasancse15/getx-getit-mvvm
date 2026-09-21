@@ -2,10 +2,15 @@ import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 
+import '../../data/datasources/product_remote_data_source.dart';
 import '../../data/datasources/user_remote_data_source.dart';
+import '../../data/repositories/product_repository_impl.dart';
 import '../../data/repositories/user_repository_impl.dart';
+import '../../domain/repositories/product_repository.dart';
 import '../../domain/repositories/user_repository.dart';
+import '../../domain/usecases/get_products.dart';
 import '../../domain/usecases/get_users.dart';
+import '../../presentation/controllers/product_controller.dart';
 import '../../presentation/controllers/user_controller.dart';
 import '../network/dio_client.dart';
 import '../network/network_info.dart';
@@ -20,6 +25,7 @@ Future<void> configureDependencies() async {
   getIt.registerLazySingleton<NetworkInfo>(
     () => NetworkInfoImpl(getIt<InternetConnection>()),
   );
+
   getIt.registerLazySingleton<UserRemoteDataSource>(
     () => UserRemoteDataSourceImpl(getIt<Dio>()),
   );
@@ -34,5 +40,22 @@ Future<void> configureDependencies() async {
   );
   getIt.registerFactory<UserController>(
     () => UserController(getIt<GetUsers>()),
+  );
+
+  getIt.registerLazySingleton<ProductRemoteDataSource>(
+    () => ProductRemoteDataSourceImpl(getIt<Dio>()),
+  );
+
+  getIt.registerLazySingleton<ProductRepository>(
+    () => ProductRepositoryImpl(
+      productRemoteDataSource: getIt<ProductRemoteDataSource>(),
+      networkInfo: getIt<NetworkInfo>(),
+    ),
+  );
+  getIt.registerLazySingleton<GetProducts>(
+    () => GetProducts(getIt<ProductRepository>()),
+  );
+  getIt.registerFactory<ProductController>(
+    () => ProductController(getIt<GetProducts>()),
   );
 }

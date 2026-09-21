@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../core/utils/logger.dart';
-import '../../domain/entities/user.dart';
+import '../../domain/entities/user/user.dart';
 import '../../domain/usecases/get_users.dart';
 
 final class UserController extends GetxController {

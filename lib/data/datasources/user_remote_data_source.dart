@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../core/constants/api_constants.dart';
 import '../../core/error/exceptions.dart';
-import '../models/users_response_model.dart';
+import '../models/user/users_response_model.dart';
 
 abstract interface class UserRemoteDataSource {
   Future<UsersResponseModel> getUsers({required int limit, required int skip});

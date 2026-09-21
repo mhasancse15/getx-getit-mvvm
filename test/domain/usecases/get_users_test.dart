@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:getxwithmvvmdemo/core/error/failures.dart';
-import 'package:getxwithmvvmdemo/domain/entities/user.dart';
+import 'package:getxwithmvvmdemo/domain/entities/user/user.dart';
 import 'package:getxwithmvvmdemo/domain/repositories/user_repository.dart';
 import 'package:getxwithmvvmdemo/domain/usecases/get_users.dart';
 import 'package:mocktail/mocktail.dart';

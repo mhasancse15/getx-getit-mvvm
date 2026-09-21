@@ -17,6 +17,14 @@ class UserListPage extends GetView<UserController> {
       appBar: AppBar(
         title: const Text('Users'),
         centerTitle: false,
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              Get.toNamed(AppRoutes.products);
+            },
+            icon: const Icon(Icons.propane_tank_outlined),
+          ),
+        ],
       ),
       body: Column(
         children: <Widget>[
@@ -29,12 +37,13 @@ class UserListPage extends GetView<UserController> {
                 hintText: 'Search by name, username, or email',
                 prefixIcon: const Icon(Icons.search_rounded),
                 suffixIcon: Obx(
-                  () => controller.searchQuery.value.isEmpty
+                      () =>
+                  controller.searchQuery.value.isEmpty
                       ? const SizedBox.shrink()
                       : IconButton(
-                          onPressed: controller.searchController.clear,
-                          icon: const Icon(Icons.clear_rounded),
-                        ),
+                    onPressed: controller.searchController.clear,
+                    icon: const Icon(Icons.clear_rounded),
+                  ),
                 ),
               ),
             ),
@@ -44,7 +53,8 @@ class UserListPage extends GetView<UserController> {
               if (controller.isLoading.value && controller.users.isEmpty) {
                 return const LoadingWidget();
               }
-              if (controller.users.isEmpty && controller.errorMessage.value.isNotEmpty) {
+              if (controller.users.isEmpty &&
+                  controller.errorMessage.value.isNotEmpty) {
                 return AppErrorWidget(onRetry: controller.fetchUsers);
               }
               if (controller.filteredUsers.isEmpty) {
@@ -56,7 +66,8 @@ class UserListPage extends GetView<UserController> {
                 onRefresh: controller.refreshUsers,
                 child: NotificationListener<ScrollNotification>(
                   onNotification: (notification) {
-                    if (notification.metrics.pixels >= notification.metrics.maxScrollExtent - 300) {
+                    if (notification.metrics.pixels >=
+                        notification.metrics.maxScrollExtent - 300) {
                       controller.loadMoreUsers();
                     }
                     return false;
@@ -64,7 +75,8 @@ class UserListPage extends GetView<UserController> {
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
-                    itemCount: displayedUsers.length + (controller.isLoadingMore.value ? 1 : 0),
+                    itemCount: displayedUsers.length +
+                        (controller.isLoadingMore.value ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index >= displayedUsers.length) {
                         return const Padding(
@@ -75,7 +87,8 @@ class UserListPage extends GetView<UserController> {
                       final user = displayedUsers[index];
                       return UserCard(
                         user: user,
-                        onTap: () => Get.toNamed('${AppRoutes.users}/${user.id}'),
+                        onTap: () =>
+                            Get.toNamed('${AppRoutes.users}/${user.id}'),
                       );
                     },
                   ),
