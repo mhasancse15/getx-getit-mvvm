@@ -23,31 +23,23 @@ final class UserController extends GetxController {
   int total = 0;
   bool hasMore = true;
 
-  List<User> get filteredUsers {
-    final query = searchQuery.value.trim().toLowerCase();
-    if (query.isEmpty) return users.toList(growable: false);
+  bool get _isSearchMode => searchQuery.value.trim().isNotEmpty;
 
-    return users
-        .where(
-          (user) => user.firstName.toLowerCase().contains(query) ||
-              user.lastName.toLowerCase().contains(query) ||
-              user.username.toLowerCase().contains(query) ||
-              user.email.toLowerCase().contains(query),
-        )
-        .toList(growable: false);
+  List<User> get filteredUsers {
+    return users.toList(growable: false);
   }
 
   @override
   void onInit() {
     super.onInit();
-    searchController.addListener(_onSearchChanged);
+    searchController.addListener(_onSearchTextChanged);
     fetchUsers();
   }
 
   @override
   void onClose() {
     searchController
-      ..removeListener(_onSearchChanged)
+      ..removeListener(_onSearchTextChanged)
       ..dispose();
     super.onClose();
   }
@@ -89,12 +81,21 @@ final class UserController extends GetxController {
   }
 
   Future<void> loadMoreUsers() async {
-    if (isLoading.value || isRefreshing.value || isLoadingMore.value || !hasMore) {
+    if (isLoading.value ||
+        isRefreshing.value ||
+        isLoadingMore.value ||
+        !hasMore) {
       return;
     }
 
     isLoadingMore.value = true;
-    final result = await _getUsers(limit: limit, skip: skip);
+    final result = _isSearchMode
+        ? await _getUsers.search(
+            query: searchQuery.value.trim(),
+            limit: limit,
+            skip: skip,
+          )
+        : await _getUsers(limit: limit, skip: skip);
     result.fold(_setError, _appendPage);
     isLoadingMore.value = false;
   }
@@ -106,8 +107,38 @@ final class UserController extends GetxController {
     return null;
   }
 
-  void _onSearchChanged() {
-    searchQuery.value = searchController.text;
+  void _onSearchTextChanged() {
+    searchQuery.value = searchController.text.trim();
+  }
+
+  Future<void> submitSearch() async {
+    if (isLoading.value || isRefreshing.value || isLoadingMore.value) return;
+    final query = searchController.text.trim();
+    searchQuery.value = query;
+    await _searchUsers(query);
+  }
+
+  Future<void> clearSearch() async {
+    searchController.clear();
+    if (isLoading.value || isRefreshing.value) return;
+    await _searchUsers('');
+  }
+
+  Future<void> _searchUsers(String query) async {
+    if (isLoading.value || isRefreshing.value) return;
+    isLoading.value = true;
+    errorMessage.value = '';
+    skip = 0;
+    total = 0;
+    hasMore = true;
+    users.clear();
+
+    final result = query.isEmpty
+        ? await _getUsers(limit: limit, skip: skip)
+        : await _getUsers.search(query: query, limit: limit, skip: skip);
+
+    result.fold(_setError, _appendPage);
+    isLoading.value = false;
   }
 
   void _appendPage(UsersPage page) {

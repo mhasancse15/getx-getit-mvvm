@@ -33,6 +33,7 @@ class UserListPage extends GetView<UserController> {
             child: TextField(
               controller: controller.searchController,
               textInputAction: TextInputAction.search,
+              onSubmitted: (_) => controller.submitSearch(),
               decoration: InputDecoration(
                 hintText: 'Search by name, username, or email',
                 prefixIcon: const Icon(Icons.search_rounded),
@@ -40,7 +41,7 @@ class UserListPage extends GetView<UserController> {
                       () => controller.searchQuery.value.isEmpty
                       ? const SizedBox.shrink()
                       : IconButton(
-                    onPressed: controller.searchController.clear,
+                        onPressed: controller.clearSearch,
                     icon: const Icon(Icons.clear_rounded),
                   ),
                 ),

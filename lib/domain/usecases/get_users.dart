@@ -15,4 +15,12 @@ final class GetUsers {
   }) {
     return _repository.getUsers(limit: limit, skip: skip);
   }
+
+  Future<Either<Failure, UsersPage>> search({
+    required String query,
+    required int limit,
+    required int skip,
+  }) {
+    return _repository.searchUsers(query: query, limit: limit, skip: skip);
+  }
 }
