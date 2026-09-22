@@ -17,12 +17,13 @@ final class UserController extends GetxController {
   final RxString errorMessage = ''.obs;
   final RxString searchQuery = ''.obs;
   final TextEditingController searchController = TextEditingController();
+  Worker? _searchDebounceWorker;
 
   int skip = 0;
   final int limit = AppConstants.pageSize;
   int total = 0;
   bool hasMore = true;
-
+  String _lastExecutedQuery = '';
   bool get _isSearchMode => searchQuery.value.trim().isNotEmpty;
 
   List<User> get filteredUsers {
@@ -33,6 +34,11 @@ final class UserController extends GetxController {
   void onInit() {
     super.onInit();
     searchController.addListener(_onSearchTextChanged);
+    _searchDebounceWorker = debounce<String>(
+      searchQuery,
+      (_) => _searchUsers(searchQuery.value.trim()),
+      time: const Duration(milliseconds: 600),
+    );
     fetchUsers();
   }
 
@@ -41,6 +47,7 @@ final class UserController extends GetxController {
     searchController
       ..removeListener(_onSearchTextChanged)
       ..dispose();
+    _searchDebounceWorker?.dispose();
     super.onClose();
   }
 
@@ -108,7 +115,9 @@ final class UserController extends GetxController {
   }
 
   void _onSearchTextChanged() {
-    searchQuery.value = searchController.text.trim();
+    final nextQuery = searchController.text.trim();
+    if (nextQuery == searchQuery.value) return;
+    searchQuery.value = nextQuery;
   }
 
   Future<void> submitSearch() async {
@@ -120,12 +129,11 @@ final class UserController extends GetxController {
 
   Future<void> clearSearch() async {
     searchController.clear();
-    if (isLoading.value || isRefreshing.value) return;
-    await _searchUsers('');
   }
 
   Future<void> _searchUsers(String query) async {
     if (isLoading.value || isRefreshing.value) return;
+    if (query == _lastExecutedQuery) return;
     isLoading.value = true;
     errorMessage.value = '';
     skip = 0;
@@ -138,6 +146,7 @@ final class UserController extends GetxController {
         : await _getUsers.search(query: query, limit: limit, skip: skip);
 
     result.fold(_setError, _appendPage);
+    _lastExecutedQuery = query;
     isLoading.value = false;
   }
 
