@@ -10,6 +10,7 @@ import '../../domain/repositories/product_repository.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../../domain/usecases/get_products.dart';
 import '../../domain/usecases/get_users.dart';
+import '../../domain/usecases/search_user.dart';
 import '../../presentation/controllers/product_controller.dart';
 import '../../presentation/controllers/product_details_controller.dart';
 import '../../presentation/controllers/user_controller.dart';
@@ -41,6 +42,10 @@ Future<void> configureDependencies() async {
   );
   getIt.registerFactory<UserController>(
     () => UserController(getIt<GetUsers>()),
+  );
+
+  getIt.registerLazySingleton<SearchUsers>(
+    () => SearchUsers(getIt<UserRepository>()),
   );
 
   getIt.registerLazySingleton<ProductRemoteDataSource>(

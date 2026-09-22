@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 
 import '../../core/di/injection.dart';
-import '../controllers/product_controller.dart';
 import '../controllers/user_controller.dart';
 
 final class UserBinding extends Bindings {

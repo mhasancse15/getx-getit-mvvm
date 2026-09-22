@@ -8,4 +8,10 @@ abstract interface class UserRepository {
     required int limit,
     required int skip,
   });
+
+  Future<Either<Failure, UsersPage>> searchUsers({
+    required String query,
+    required int limit,
+    required int skip,
+  });
 }

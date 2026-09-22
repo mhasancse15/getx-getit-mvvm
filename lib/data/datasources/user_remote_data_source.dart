@@ -6,6 +6,11 @@ import '../models/user/users_response_model.dart';
 
 abstract interface class UserRemoteDataSource {
   Future<UsersResponseModel> getUsers({required int limit, required int skip});
+  Future<UsersResponseModel> searchUsers({
+    required String query,
+    int limit = 20,
+    int skip = 0,
+  });
 }
 
 final class UserRemoteDataSourceImpl implements UserRemoteDataSource {
@@ -79,6 +84,35 @@ final class UserRemoteDataSourceImpl implements UserRemoteDataSource {
         return const ServerException();
       default:
         return UnknownDioException('Unexpected HTTP status: $statusCode');
+    }
+  }
+
+  @override
+  Future<UsersResponseModel> searchUsers({required String query, int limit = 20, int skip = 0}) async{
+    try {
+      final response = await _dio.get<dynamic>(
+        ApiConstants.searchUsers,
+        queryParameters: <String, dynamic>{'query': query, 'limit': limit, 'skip': skip},
+      );
+
+      final statusCode = response.statusCode ?? 0;
+      if (statusCode < 200 || statusCode >= 300) {
+        throw _exceptionForStatus(statusCode);
+      }
+
+      final data = response.data;
+      if (data is! Map<String, dynamic>) {
+        throw const UnknownDioException('The API response had an invalid format.');
+      }
+      return UsersResponseModel.fromJson(data);
+    } on DioException catch (error) {
+      throw _mapDioException(error);
+    } on AppException {
+      rethrow;
+    } on FormatException catch (error) {
+      throw UnknownDioException(error.message);
+    } catch (error) {
+      throw UnknownDioException(error.toString());
     }
   }
 }
