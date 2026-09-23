@@ -33,17 +33,18 @@ class UserListPage extends GetView<UserController> {
             child: TextField(
               controller: controller.searchController,
               textInputAction: TextInputAction.search,
+              onChanged: controller.onSearchChanged,
               onSubmitted: (_) => controller.submitSearch(),
               decoration: InputDecoration(
                 hintText: 'Search by name, username, or email',
                 prefixIcon: const Icon(Icons.search_rounded),
                 suffixIcon: Obx(
-                      () => controller.searchQuery.value.isEmpty
+                  () => controller.searchQuery.value.isEmpty
                       ? const SizedBox.shrink()
                       : IconButton(
-                        onPressed: controller.clearSearch,
-                    icon: const Icon(Icons.clear_rounded),
-                  ),
+                          onPressed: controller.clearSearch,
+                          icon: const Icon(Icons.clear_rounded),
+                        ),
                 ),
               ),
             ),
@@ -75,7 +76,8 @@ class UserListPage extends GetView<UserController> {
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
-                    itemCount: displayedUsers.length +
+                    itemCount:
+                        displayedUsers.length +
                         (controller.isLoadingMore.value ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index >= displayedUsers.length) {

@@ -5,11 +5,14 @@ import '../../core/constants/app_constants.dart';
 import '../../core/utils/logger.dart';
 import '../../domain/entities/user/user.dart';
 import '../../domain/usecases/get_users.dart';
+import '../../domain/usecases/search_user.dart';
 
 final class UserController extends GetxController {
-  UserController(this._getUsers);
+  UserController(this._getUsers, this._searchUsersUseCase);
 
   final GetUsers _getUsers;
+  final SearchUsers _searchUsersUseCase;
+
   final RxList<User> users = <User>[].obs;
   final RxBool isLoading = false.obs;
   final RxBool isRefreshing = false.obs;
@@ -24,6 +27,7 @@ final class UserController extends GetxController {
   int total = 0;
   bool hasMore = true;
   String _lastExecutedQuery = '';
+
   bool get _isSearchMode => searchQuery.value.trim().isNotEmpty;
 
   List<User> get filteredUsers {
@@ -33,10 +37,9 @@ final class UserController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    searchController.addListener(_onSearchTextChanged);
     _searchDebounceWorker = debounce<String>(
       searchQuery,
-      (_) => _searchUsers(searchQuery.value.trim()),
+      (_) => _searchUsers(searchQuery.value),
       time: const Duration(milliseconds: 600),
     );
     fetchUsers();
@@ -44,9 +47,6 @@ final class UserController extends GetxController {
 
   @override
   void onClose() {
-    searchController
-      ..removeListener(_onSearchTextChanged)
-      ..dispose();
     _searchDebounceWorker?.dispose();
     super.onClose();
   }
@@ -97,7 +97,7 @@ final class UserController extends GetxController {
 
     isLoadingMore.value = true;
     final result = _isSearchMode
-        ? await _getUsers.search(
+        ? await _searchUsersUseCase(
             query: searchQuery.value.trim(),
             limit: limit,
             skip: skip,
@@ -114,21 +114,25 @@ final class UserController extends GetxController {
     return null;
   }
 
-  void _onSearchTextChanged() {
-    final nextQuery = searchController.text.trim();
-    if (nextQuery == searchQuery.value) return;
-    searchQuery.value = nextQuery;
-  }
-
   Future<void> submitSearch() async {
     if (isLoading.value || isRefreshing.value || isLoadingMore.value) return;
     final query = searchController.text.trim();
+    if (query == searchQuery.value &&
+        query == _lastExecutedQuery) {
+      return;
+    }
+
     searchQuery.value = query;
     await _searchUsers(query);
   }
 
+  void onSearchChanged(String value) {
+    searchQuery.value = value.trim();
+  }
+
   Future<void> clearSearch() async {
     searchController.clear();
+    searchQuery.value = '';
   }
 
   Future<void> _searchUsers(String query) async {

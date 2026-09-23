@@ -41,7 +41,10 @@ Future<void> configureDependencies() async {
     () => GetUsers(getIt<UserRepository>()),
   );
   getIt.registerFactory<UserController>(
-    () => UserController(getIt<GetUsers>()),
+    () => UserController(
+        getIt<GetUsers>(),
+        getIt<SearchUsers>(),
+    ),
   );
 
   getIt.registerLazySingleton<SearchUsers>(
